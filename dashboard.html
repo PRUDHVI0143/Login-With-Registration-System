@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - AuthShield Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <div class="particles-container" id="particles"></div>
+
+  <!-- Theme Toggle -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Theme" aria-label="Toggle theme">
+    <i data-lucide="sun" id="sunIcon" style="width:20px;height:20px;"></i>
+    <i data-lucide="moon" id="moonIcon" style="width:20px;height:20px;display:none;"></i>
+  </button>
+
+  <div class="dashboard-container">
+    <div class="dash-card">
+      
+      <div class="dash-header">
+        <div class="user-profile-badge">
+          <div class="avatar" id="avatarCircle">U</div>
+          <div>
+            <h2 id="welcomeHeading" style="font-weight:700;font-size:1.35rem;">Welcome Back!</h2>
+            <p id="userEmailSub" style="color:var(--text-muted);font-size:0.875rem;margin-top:2px;">user@example.com</p>
+          </div>
+        </div>
+        
+        <button id="logoutBtn" class="btn-secondary">
+          <i data-lucide="log-out" style="width:18px;"></i>
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <h4>Account Status</h4>
+          <p style="color:var(--accent-success);display:flex;align-items:center;gap:6px;">
+            <i data-lucide="shield-check" style="width:18px;"></i> Active & Verified
+          </p>
+        </div>
+
+        <div class="stat-box">
+          <h4>Security Level</h4>
+          <p style="color:var(--accent-primary);display:flex;align-items:center;gap:6px;">
+            <i data-lucide="lock" style="width:18px;"></i> Encrypted
+          </p>
+        </div>
+
+        <div class="stat-box">
+          <h4>Member Since</h4>
+          <p id="memberSinceVal" style="display:flex;align-items:center;gap:6px;">
+            <i data-lucide="calendar" style="width:18px;color:var(--accent-secondary);"></i>
+            <span id="memberDate">2026</span>
+          </p>
+        </div>
+      </div>
+
+      <div style="background:var(--input-bg);padding:24px;border-radius:var(--radius-md);border:1px solid var(--input-border);">
+        <h3 style="font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;font-weight:700;">
+          <i data-lucide="activity" style="width:20px;color:var(--accent-primary);"></i>
+          Session Activity
+        </h3>
+        <ul id="activityLog" style="list-style:none;color:var(--text-muted);font-size:0.85rem;display:flex;flex-direction:column;gap:12px;">
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const userRaw = localStorage.getItem('auth_current_user') || sessionStorage.getItem('auth_current_user');
+      
+      if (!userRaw) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const user = JSON.parse(userRaw);
+      document.getElementById('welcomeHeading').textContent = `Welcome, ${user.username}!`;
+      document.getElementById('userEmailSub').textContent = user.email || 'user@example.com';
+      document.getElementById('avatarCircle').textContent = user.username.charAt(0).toUpperCase();
+      document.getElementById('memberDate').textContent = user.joined || '2026';
+
+      // Build activity log
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      const logs = [
+        { icon: 'check', color: 'var(--accent-success)', text: 'Authentication verified', time: timeStr },
+        { icon: 'key', color: 'var(--accent-primary)', text: 'Password hash validated', time: timeStr },
+        { icon: 'globe', color: 'var(--accent-secondary)', text: 'Session token generated', time: 'Active' },
+        { icon: 'monitor', color: 'var(--accent-warning)', text: `Logged in from ${navigator.platform}`, time: 'Current' },
+      ];
+
+      const logEl = document.getElementById('activityLog');
+      logs.forEach((log, i) => {
+        const li = document.createElement('li');
+        li.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;' + (i < logs.length - 1 ? 'border-bottom:1px dashed var(--input-border);' : '');
+        li.innerHTML = `
+          <span style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="${log.icon}" style="width:14px;color:${log.color};"></i> ${log.text}
+          </span>
+          <span style="color:var(--text-subtle);font-size:0.78rem;font-weight:500;">${log.time}</span>
+        `;
+        logEl.appendChild(li);
+      });
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('auth_current_user');
+        sessionStorage.removeItem('auth_current_user');
+        window.location.href = 'index.html';
+      });
+
+      // Particles
+      const container = document.getElementById('particles');
+      if (container) {
+        for (let i = 0; i < 20; i++) {
+          const p = document.createElement('div');
+          p.className = 'particle';
+          p.style.left = Math.random() * 100 + '%';
+          p.style.animationDuration = (8 + Math.random() * 12) + 's';
+          p.style.animationDelay = (Math.random() * 10) + 's';
+          p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+          container.appendChild(p);
+        }
+      }
+
+      // Theme
+      const sunIcon = document.getElementById('sunIcon');
+      const moonIcon = document.getElementById('moonIcon');
+      const themeToggle = document.getElementById('themeToggle');
+      
+      function applyTheme(theme) {
+        const isLight = theme === 'light';
+        if (isLight) document.body.setAttribute('data-theme', 'light');
+        else document.body.removeAttribute('data-theme');
+        sunIcon.style.display = isLight ? 'none' : 'block';
+        moonIcon.style.display = isLight ? 'block' : 'none';
+        lucide.createIcons();
+      }
+
+      applyTheme(localStorage.getItem('auth_theme') || 'dark');
+      themeToggle.addEventListener('click', () => {
+        const newTheme = document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        applyTheme(newTheme);
+        localStorage.setItem('auth_theme', newTheme);
+      });
+
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuthShield - Modern Login & Registration System</title>
+  <meta name="description" content="Secure, fast, and modern Login and Registration authentication portal with dual mode PHP/MySQL & LocalStorage engine.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <div class="particles-container" id="particles"></div>
+
+  <!-- Theme Toggle -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Theme" aria-label="Toggle light and dark theme">
+    <i data-lucide="sun" id="sunIcon" style="width:20px;height:20px;"></i>
+    <i data-lucide="moon" id="moonIcon" style="width:20px;height:20px;display:none;"></i>
+  </button>
+
+  <!-- Auth Card -->
+  <div class="auth-wrapper">
+    <div class="glass-card">
+      
+      <!-- Brand -->
+      <div class="brand-header">
+        <div class="brand-icon">
+          <i data-lucide="shield-check" style="width:28px;height:28px;"></i>
+        </div>
+        <h1 class="brand-title">AuthShield</h1>
+        <p class="brand-subtitle">Secure Access & Account Portal</p>
+        <div id="modeBadge" class="mode-badge">
+          <span class="dot"></span>
+          <span id="modeText">Demo Mode</span>
+        </div>
+      </div>
+
+      <!-- Tabs with Sliding Indicator -->
+      <div class="tabs-container" role="tablist">
+        <div class="tab-slider" id="tabSlider"></div>
+        <button id="loginTab" class="tab-btn active" role="tab" aria-selected="true">Sign In</button>
+        <button id="registerTab" class="tab-btn" role="tab" aria-selected="false">Create Account</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label class="form-label" for="loginIdentifier">Username or Email</label>
+          <div class="input-wrapper">
+            <span class="input-icon"><i data-lucide="user" style="width:18px;"></i></span>
+            <input type="text" id="loginIdentifier" name="identifier" class="form-input" placeholder="alex@example.com or alex" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <div class="input-wrapper has-toggle">
+            <span class="input-icon"><i data-lucide="lock" style="width:18px;"></i></span>
+            <input type="password" id="loginPassword" name="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="password-toggle" data-target="loginPassword" aria-label="Toggle password visibility">
+              <i data-lucide="eye" style="width:18px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe" name="remember">
+            <span class="custom-checkbox"></span>
+            <span>Remember me</span>
+          </label>
+          <a href="#" id="forgotPasswordBtn" class="forgot-link">Forgot Password?</a>
+        </div>
+
+        <button type="submit" id="loginSubmitBtn" class="submit-btn">
+          <span class="btn-text">Sign In</span>
+          <i data-lucide="arrow-right" class="btn-icon" style="width:18px;"></i>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="registerForm" class="auth-form" style="display:none;">
+        <div class="form-group">
+          <label class="form-label" for="regUsername">Username</label>
+          <div class="input-wrapper">
+            <span class="input-icon"><i data-lucide="at-sign" style="width:18px;"></i></span>
+            <input type="text" id="regUsername" name="username" class="form-input" placeholder="Choose a username" required autocomplete="username" minlength="3" maxlength="30">
+            <span class="validation-icon" id="usernameValidIcon"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regEmail">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon"><i data-lucide="mail" style="width:18px;"></i></span>
+            <input type="email" id="regEmail" name="email" class="form-input" placeholder="you@example.com" required autocomplete="email">
+            <span class="validation-icon" id="emailValidIcon"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regPassword">Password</label>
+          <div class="input-wrapper has-toggle">
+            <span class="input-icon"><i data-lucide="lock" style="width:18px;"></i></span>
+            <input type="password" id="regPassword" name="password" class="form-input" placeholder="Create a strong password" required autocomplete="new-password">
+            <button type="button" class="password-toggle" data-target="regPassword" aria-label="Toggle password visibility">
+              <i data-lucide="eye" style="width:18px;"></i>
+            </button>
+          </div>
+          <div class="strength-meter">
+            <div class="strength-bar" id="bar1"></div>
+            <div class="strength-bar" id="bar2"></div>
+            <div class="strength-bar" id="bar3"></div>
+          </div>
+          <div class="strength-text">
+            <span>Strength</span>
+            <span id="strengthLabel">—</span>
+          </div>
+          <div class="password-requirements">
+            <div class="req-item" id="reqLen"><span class="req-dot"></span> 6+ chars</div>
+            <div class="req-item" id="reqUpper"><span class="req-dot"></span> Uppercase</div>
+            <div class="req-item" id="reqNum"><span class="req-dot"></span> Number</div>
+            <div class="req-item" id="reqSpec"><span class="req-dot"></span> Symbol</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regPassword2">Confirm Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon"><i data-lucide="check-circle" style="width:18px;"></i></span>
+            <input type="password" id="regPassword2" name="password2" class="form-input" placeholder="Re-enter your password" required autocomplete="new-password">
+            <span class="validation-icon" id="confirmValidIcon"></span>
+          </div>
+        </div>
+
+        <button type="submit" id="registerSubmitBtn" class="submit-btn">
+          <span class="btn-text">Create Account</span>
+          <i data-lucide="user-plus" class="btn-icon" style="width:18px;"></i>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <!-- Social -->
+      <div class="divider"><span>or continue with</span></div>
+      <div class="social-btns">
+        <button type="button" class="social-btn" id="githubAuthBtn">
+          <i data-lucide="github" style="width:18px;"></i><span>GitHub</span>
+        </button>
+        <button type="button" class="social-btn" id="googleAuthBtn">
+          <i data-lucide="chrome" style="width:18px;"></i><span>Google</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer"></div>
+
+  <script src="script.js?v=3"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

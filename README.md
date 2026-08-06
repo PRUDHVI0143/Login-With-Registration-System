@@ -1,276 +1,131 @@
-# Login-With-Registration-System
-A simple Login and Registration System using HTML, CSS, JS, PHP, and MySQL. Users can create accounts, store credentials securely with hashed passwords, and log in using email or username. PHP handles validation, sessions, and authentication, while MySQL stores user data.
-======================
-FILE: db.php
-======================
-<?php
+# 🛡️ AuthShield - Modern Login & Registration System
+
+![Version](https://img.shields.io/badge/version-2.0.0-indigo.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![PHP](https://img.shields.io/badge/PHP-8.0%2B-777BB4.svg)
+![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1.svg)
+![UI](https://img.shields.io/badge/Design-Glassmorphism-pink.svg)
+
+A state-of-the-art, secure **Login and Registration System** featuring a modern glassmorphism UI, dual execution engines (Client-Side LocalStorage Preview & PHP/PDO MySQL Backend), real-time validation, live password strength meter, session management, and BCRYPT password hashing.
+
+---
+
+## ✨ Features
+
+- 🎨 **Modern Glassmorphism UI**: Built with custom CSS variables, floating blur background orbs, sleek micro-interactions, dark/light theme toggle, and Google Fonts (*Inter*).
+- ⚡ **Dual Execution Engine**:
+  - **Client Storage Mode (Demo)**: Instant interactive preview running in any browser using `localStorage` (no PHP/MySQL installation needed).
+  - **PHP & MySQL Mode**: Full server-side production backend with PDO prepared statements and session protection.
+- 🔒 **Enterprise-Grade Security**:
+  - **BCRYPT Hashing**: Passwords stored safely using PHP `password_hash()` and `password_verify()`.
+  - **SQL Injection Defense**: 100% prepared PDO statements with parameterized bindings.
+  - **Session Protection**: Automatic session ID regeneration (`session_regenerate_id(true)`) to prevent session fixation.
+  - **XSS Sanitization**: Input validation and output encoding (`htmlspecialchars`).
+- 🔑 **Smart Authentication**:
+  - Support login via **Username** or **Email**.
+  - Interactive password visibility toggle (Eye icon).
+  - Real-time password strength meter (Weak / Medium / Strong).
+  - Toast notification system for user feedback.
+  - Remember Me functionality.
+- 📊 **User Dashboard**: Dedicated post-login portal with avatar generation, account stats, and session activity logs.
+
+---
+
+## 📁 Repository Structure
+
+```text
+Login-With-Registration-System/
+├── index.html         # Main Authentication Portal (Login / Register Tabs)
+├── style.css          # Modern Glassmorphism & UI Design System
+├── script.js           # Client-side Validation, Animations & LocalStorage Engine
+├── dashboard.html     # Client-Side Demo Dashboard (Static Mode)
+├── dashboard.php      # PHP Authenticated User Dashboard (Server Mode)
+├── db.php             # Secure PDO Database Connection
+├── register.php       # PHP Backend Account Registration Endpoint
+├── login.php          # PHP Backend User Authentication Endpoint
+├── logout.php         # PHP Session Destruction & Cookie Handler
+└── schema.sql         # MySQL Database Creation & Seed Data Script
+```
+
+---
+
+## 🚀 Quick Start Guide
+
+### Option A: Instant Client Preview (No PHP Required)
+
+1. Double-click or open `index.html` in any web browser.
+2. Click **Create Account** to register a new user, or use the pre-seeded demo user:
+   - **Username**: `demo`
+   - **Password**: `password123`
+3. Enjoy full interactive authentication and dashboard experience saved to your browser's local storage.
+
+---
+
+### Option B: PHP & MySQL Local Server (XAMPP / WAMP / Docker)
+
+#### 1. Setup Database
+1. Open your MySQL interface (e.g. phpMyAdmin or MySQL CLI).
+2. Execute the `schema.sql` script to create database and tables:
+   ```bash
+   mysql -u root -p < schema.sql
+   ```
+
+#### 2. Configure Connection (`db.php`)
+Verify database credentials in `db.php`:
+```php
 $DB_HOST = 'localhost';
 $DB_USER = 'root';
 $DB_PASS = '';
 $DB_NAME = 'auth_demo';
+```
 
-$mysqli = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+#### 3. Run Development Server
+Start PHP built-in web server in the project directory:
+```bash
+php -S localhost:8000
+```
+Open `http://localhost:8000` in your web browser.
 
-if ($mysqli->connect_errno) {
-    die("Database connection failed: " . $mysqli->connect_error);
-}
-?>
+---
 
-======================
-FILE: index.html
-======================
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Login/Register</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+## 🔌 API Endpoints Reference
 
-<div class="container">
-  <div class="card">
-    <div class="tabs">
-      <button id="loginTab" class="active">Login</button>
-      <button id="registerTab">Register</button>
-    </div>
+| Endpoint | Method | Input Parameters | Response / Behavior |
+| :--- | :--- | :--- | :--- |
+| `register.php` | `POST` | `username`, `email`, `password`, `password2` | Hashes password, inserts user into database, redirects or returns JSON |
+| `login.php` | `POST` | `identifier` (username/email), `password` | Validates hash, starts `$_SESSION`, redirects to `dashboard.php` |
+| `logout.php` | `POST`/`GET` | None | Destroys session, deletes session cookie, redirects to `index.html` |
+| `db.php` | Included | Credentials env / variables | Establishes PDO connection with error mode set to exception |
 
-    <!-- LOGIN -->
-    <form id="loginForm" action="login.php" method="POST">
-      <h2>Login</h2>
-      <input type="text" name="identifier" placeholder="Username or Email" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-      <p id="loginMessage"></p>
-    </form>
+---
 
-    <!-- REGISTER -->
-    <form id="registerForm" action="register.php" method="POST" style="display:none">
-      <h2>Register</h2>
-      <input type="text" name="username" placeholder="Username" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <input type="password" name="password2" placeholder="Confirm Password" required>
-      <button type="submit">Register</button>
-      <p id="registerMessage"></p>
-    </form>
+## 🔐 Database Schema (`schema.sql`)
 
-  </div>
-</div>
-
-<script src="script.js"></script>
-</body>
-</html>
-
-======================
-FILE: style.css
-======================
-body {
-  font-family: Arial;
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-  background: #e9eef5;
-}
-.container {
-  width: 350px;
-}
-.card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,.1);
-}
-.tabs { display: flex; }
-.tabs button {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  background: #ddd;
-}
-.tabs .active {
-  background: #3b82f6;
-  color: white;
-}
-form { display: flex; flex-direction: column; }
-form input {
-  padding: 10px;
-  margin: 7px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-form button {
-  margin-top: 10px;
-  padding: 10px;
-  background: #3b82f6;
-  border: none;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-}
-p { text-align: center; color: red; height: 18px; }
-
-======================
-FILE: script.js
-======================
-let loginTab = document.getElementById("loginTab");
-let registerTab = document.getElementById("registerTab");
-let loginForm = document.getElementById("loginForm");
-let registerForm = document.getElementById("registerForm");
-
-loginTab.onclick = () => {
-  loginTab.classList.add("active");
-  registerTab.classList.remove("active");
-  loginForm.style.display = "block";
-  registerForm.style.display = "none";
-};
-
-registerTab.onclick = () => {
-  registerTab.classList.add("active");
-  loginTab.classList.remove("active");
-  registerForm.style.display = "block";
-  loginForm.style.display = "none";
-};
-
-======================
-FILE: register.php
-======================
-<?php
-session_start();
-require "db.php";
-
-$username = $_POST["username"];
-$email = $_POST["email"];
-$pass = $_POST["password"];
-$pass2 = $_POST["password2"];
-
-if ($pass !== $pass2) {
-  header("Location: index.html?msg=Passwords do not match&type=register");
-  exit;
-}
-
-$check = $mysqli->prepare("SELECT id FROM users WHERE username=? OR email=?");
-$check->bind_param("ss", $username, $email);
-$check->execute();
-$check->store_result();
-
-if ($check->num_rows > 0) {
-  header("Location: index.html?msg=User already exists&type=register");
-  exit;
-}
-$check->close();
-
-$hashed = password_hash($pass, PASSWORD_DEFAULT);
-
-$insert = $mysqli->prepare("INSERT INTO users(username,email,password) VALUES(?,?,?)");
-$insert->bind_param("sss", $username, $email, $hashed);
-$insert->execute();
-
-header("Location: index.html?msg=Registered successfully! Login now&type=login");
-exit;
-
-?>
-
-======================
-FILE: login.php
-======================
-<?php
-session_start();
-require "db.php";
-
-$id = $_POST["identifier"];
-$pass = $_POST["password"];
-
-if (filter_var($id, FILTER_VALIDATE_EMAIL)) {
-  $stmt = $mysqli->prepare("SELECT id, username, password FROM users WHERE email=?");
-} else {
-  $stmt = $mysqli->prepare("SELECT id, username, password FROM users WHERE username=?");
-}
-$stmt->bind_param("s", $id);
-$stmt->execute();
-$res = $stmt->get_result();
-
-if ($res->num_rows === 0) {
-  header("Location: index.html?msg=User not found&type=login");
-  exit;
-}
-
-$user = $res->fetch_assoc();
-
-if (!password_verify($pass, $user["password"])) {
-  header("Location: index.html?msg=Wrong password&type=login");
-  exit;
-}
-
-$_SESSION["user"] = $user["username"];
-header("Location: dashboard.php");
-exit;
-
-?>
-
-======================
-FILE: dashboard.php
-======================
-<?php
-session_start();
-if (!isset($_SESSION["user"])) {
-  header("Location: index.html");
-  exit;
-}
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<title>Dashboard</title>
-<style>
-body { font-family: Arial; background:#eef2f7; padding:40px; }
-.card {
-  padding: 20px; background:white; border-radius:10px;
-  max-width: 400px; margin:auto; text-align:center;
-  box-shadow: 0 5px 12px rgba(0,0,0,.1);
-}
-button {
-  padding:10px 15px; background:#3b82f6; color:white;
-  border:none; border-radius:5px; cursor:pointer;
-}
-</style>
-</head>
-<body>
-
-<div class="card">
-  <h2>Welcome, <?php echo $_SESSION["user"]; ?>!</h2>
-  <p>You are logged in.</p>
-  <form action="logout.php" method="POST">
-    <button type="submit">Logout</button>
-  </form>
-</div>
-
-</body>
-</html>
-
-======================
-FILE: logout.php
-======================
-<?php
-session_start();
-session_destroy();
-header("Location: index.html");
-exit;
-?>
-
-======================
-SQL (Create Database)
-======================
-CREATE DATABASE auth_demo;
+```sql
+CREATE DATABASE IF NOT EXISTS auth_demo;
 USE auth_demo;
 
-CREATE TABLE users(
- id INT AUTO_INCREMENT PRIMARY KEY,
- username VARCHAR(50) UNIQUE,
- email VARCHAR(100) UNIQUE,
- password VARCHAR(255)
+CREATE TABLE users (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+```
 
+---
+
+## 🛠️ Built With
+
+- **HTML5 & CSS3**: Semantic elements, CSS Custom Properties, Glassmorphism backdrop-filters, CSS Grid/Flexbox.
+- **JavaScript (ES6+)**: Async/Fetch API, DOM manipulation, Lucide Icons, LocalStorage API.
+- **PHP 8+**: PDO database handling, Session control, Password Hashing API.
+- **MySQL**: Relational database storage with indexed unique keys.
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
